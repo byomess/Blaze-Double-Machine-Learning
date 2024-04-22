@@ -6,8 +6,15 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
 
+# Check if GPU is available
+if tf.config.list_physical_devices('GPU'):
+    print('GPU available - training on GPU...')
+    tf.config.experimental.set_memory_growth(tf.config.list_physical_devices('GPU')[0], True)
+else:
+    print('No GPU available - training on CPU...')
+
 # Load the dataset
-with open("../../datasets/history-250K.json", "r") as f:
+with open("history-250K.json", "r") as f:
     data = json.load(f)
 
 # Prepare the data
@@ -58,7 +65,7 @@ param_grid = {
 }
 
 # Perform grid search
-grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=5)
+grid = GridSearchCV(estimator=model, param_grid=param_grid, cv=5, n_jobs=-1)
 grid_result = grid.fit(X_train, y_train)
 
 # Get the best model from the grid search
